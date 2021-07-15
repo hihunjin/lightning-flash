@@ -2,9 +2,9 @@ from flash.core.data.data_module import DataModule
 
 
 class AudioSourceSeparationData(DataModule):
-    """Data module for semantic segmentation tasks."""
+    """Data module for Audio Separation tasks."""
 
-    preprocess_cls = SemanticSegmentationPreprocess
+#     preprocess_cls = SemanticSegmentationPreprocess
 
     @staticmethod
     def configure_data_fetcher(
