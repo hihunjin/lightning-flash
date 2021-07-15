@@ -1,5 +1,22 @@
 from flash.core.data.data_module import DataModule
 
+from torch.utils.data import DataLoader
+
+from asteroid.data import LibriMix
+
+class AudioSourceSeparationData():
+    def from_folders(
+        train_folder="data/hymenoptera_data/train/",
+        val_folder="data/hymenoptera_data/val/",
+    ):
+        
+        
+train_set, val_set = LibriMix.mini_from_download(task='sep_clean')
+train_loader = DataLoader(train_set, batch_size=4, drop_last=True)
+val_loader = DataLoader(val_set, batch_size=4, drop_last=True)
+
+'''
+from flash.core.data.data_module import DataModule
 
 class AudioSourceSeparationData(DataModule):
     """Data module for Audio Separation tasks."""
@@ -165,3 +182,4 @@ datamodule = AudioSourceSeparationData.from_folders(
     train_folder="data/hymenoptera_data/train/",
     val_folder="data/hymenoptera_data/val/",
 )
+'''
