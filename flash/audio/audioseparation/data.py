@@ -1,4 +1,4 @@
-from flash.core.data.data_module import 
+from flash.core.data.data_module import DataModule
 
 
 class AudioSourceSeparationData(DataModule):
