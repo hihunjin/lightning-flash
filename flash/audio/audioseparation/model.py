@@ -27,8 +27,8 @@ from flash.image.segmentation.backbones import SEMANTIC_SEGMENTATION_BACKBONES
 from flash.image.segmentation.heads import SEMANTIC_SEGMENTATION_HEADS
 from flash.image.segmentation.serialization import SegmentationLabels
 
-if _KORNIA_AVAILABLE:
-    import kornia as K
+# if _KORNIA_AVAILABLE:
+#     import kornia as K
 
 
 # class SemanticSegmentationPostprocess(Postprocess):
@@ -39,7 +39,41 @@ if _KORNIA_AVAILABLE:
 #         sample[DefaultDataKeys.INPUT] = resize(torch.stack(sample[DefaultDataKeys.INPUT]))
 #         return super().per_sample_transform(sample)
 
+from asteroid.masknn import TDConvNet
+from asteroid_filterbanks import make_enc_dec
 
+class AudioSourceSeparation(nn.Module):
+    def __init__(self, n_src):
+        super().__init__()
+        # Encoder and Decode in "one line"
+        self.enc, self.dec = make_enc_dec(
+            fb_name : 'stft', n_filters=256, kernel_size=128, stride=64,
+            # the rest four are default
+            sample_rate=8000.0,
+            who_is_pinv=None,
+            padding=0,
+            output_padding=0,
+            )
+        # # Mask network from ConvTasNet in one line.
+        self.masker = TDConvNet(in_chan=self.enc.n_feats_out, 
+                                n_src=n_src)
+    
+    def forward(self, wav):
+        # Simplified forward
+        tf_rep = self.enc(wav)
+        masks = self.masker(tf_rep)
+        wavs_out = self.dec(tf_rep.unsqueeze(1) * masks)
+        return wavs_out
+
+
+# Define and forward 
+# stft_conv_tasnet = AudioSourceSeparation(n_src=2)
+# wav_out = stft_conv_tasnet(torch.randn(1, 1, 16000))
+
+
+
+
+'''
 class AudioSourceSeparation(AudioSourceSeparationTask):
 #     """``SemanticSegmentation`` is a :class:`~flash.Task` for semantic segmentation of images. For more details, see
 #     :ref:`semantic_segmentation`.
@@ -172,3 +206,4 @@ class AudioSourceSeparation(AudioSourceSeparationTask):
         This function is used only for debugging usage with CI
         """
         assert history[-1]["val_iou"] > 0.2
+'''
